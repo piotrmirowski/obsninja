@@ -2935,7 +2935,16 @@ async function segmentFilterGreen(now, metadata) { // runs at like 15fps
 	try {
 		session.canvasSource.width = metadata.width;
 		session.canvasSource.height = metadata.height;
-		var segment = await net.segmentPerson(session.canvasSource);
+		var segment = await net.segmentPerson(
+			session.canvasSource,
+			{
+				internalResolution: 'low',
+				segmentationThreshold: 0.7,
+				maxDetections: 1,
+				scoreThreshold: 0.3,
+				nmsRadius: 20,
+				flipHorizontal: true,
+			});
 		mask = bodyPix.toMask(segment, {r: 0, g: 0, b: 0, a: 0}, {r: 0, g: 255, b: 0, a: 255});
 	} catch (e){
 	//	errorlog(e);
@@ -12114,7 +12123,7 @@ if ((session.effects==3) || (session.effects==4) || (session.effects==5)){
 				net = await bodyPix.load({
 				  architecture: 'MobileNetV1',
 				  outputStride: 16,
-				  multiplier: 0.75,
+				  multiplier: 0.5,
 				  quantBytes: 2
 				});
 				log("LOADED MODEL"); // https://github.com/tensorflow/tfjs-models/tree/master/body-pix
